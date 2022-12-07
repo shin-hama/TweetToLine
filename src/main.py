@@ -1,54 +1,35 @@
 from datetime import datetime, timezone, timedelta
-import os
 
-from dotenv import load_dotenv
-from linebot import LineBotApi
-import tweepy
-from tweepy.models import Status
-from linebot.models import ImageSendMessage, TextSendMessage
-
-
-load_dotenv()
-
-# 各認証情報を準備
-api_key = os.getenv("TWITTER_API_KEY")
-api_secret = os.getenv("TWITTER_API_SECRET")
-twitter_access_token = os.getenv("TWITTER_ACCESS_TOKEN")
-twitter_access_token_secret = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
-
-twitter_user_id = os.getenv("TWITTER_USER_ID")
-
-# API認証
-auth = tweepy.OAuthHandler(api_key, api_secret)
-auth.set_access_token(twitter_access_token, twitter_access_token_secret)
-
-twitter = tweepy.API(auth)
-result: list[Status] = twitter.user_timeline(id=twitter_user_id, count=1)
-
-# 最新のツイートを取得
-tweet = result[0]
+from config import TWITTER_USER_ID
+from get_tweet import get_tweet
+from send_message import send_image, send_message
 
 JST = timezone(timedelta(hours=9), "JST")
-now = datetime.now(JST)
 
-if isinstance(tweet.created_at, datetime) is False:
-    # 日付がわからないときは判別不可能なので、何もしない
-    exit()
 
-delta: timedelta = now - tweet.created_at
-if delta.days > 1:
-    # Tweet がないときは更新しないこととする
-    exit()
+def main():
+    """
+    Get latest tweet and notify it by line bot
+    """
+    tweet = get_tweet(TWITTER_USER_ID)
 
-line_access_token = os.getenv("LINE_BOT_ACCESS_TOKEN")
+    now = datetime.now(JST)
 
-line = LineBotApi(line_access_token)
-line.broadcast(TextSendMessage(text=tweet.text))
+    if isinstance(tweet.created_at, datetime):
+        delta = now - tweet.created_at
+    else:
+        # 日付がわからないときは判別不可能なので、何もしない
+        return
 
-for media in tweet.extended_entities["media"]:
-    line.broadcast(
-        ImageSendMessage(
-            original_content_url=media["media_url_https"],
-            preview_image_url=media["media_url_https"],
-        )
-    )
+    if delta.days > 1:
+        # Tweet 更新なしとする
+        return
+
+    send_message(tweet.text)
+
+    for media in tweet.extended_entities["media"]:
+        send_image(media["media_url_https"])
+
+
+if __name__ == "__main__":
+    main()

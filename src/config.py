@@ -1,0 +1,16 @@
+import os
+
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
+# 各認証情報を準備
+TWITTER_API_KEY = os.getenv("TWITTER_API_KEY")
+TWITTER_API_SECRET = os.getenv("TWITTER_API_SECRET")
+TWITTER_ACCESS_TOKEN = os.getenv("TWITTER_ACCESS_TOKEN")
+TWITTER_ACCESS_TOKEN_SECRET = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
+
+TWITTER_USER_ID = os.getenv("TWITTER_USER_ID")
+
+LINE_BOT_ACCESS_TOKEN = os.getenv("LINE_BOT_ACCESS_TOKEN")
