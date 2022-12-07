@@ -5,10 +5,10 @@ from dotenv import load_dotenv
 from linebot import LineBotApi
 import tweepy
 from tweepy.models import Status
-from linebot.models import TextSendMessage
+from linebot.models import ImageSendMessage, TextSendMessage
+
 
 load_dotenv()
-
 
 # 各認証情報を準備
 api_key = os.getenv("TWITTER_API_KEY")
@@ -28,26 +28,27 @@ result: list[Status] = twitter.user_timeline(id=twitter_user_id, count=1)
 # 最新のツイートを取得
 tweet = result[0]
 
-print(dir(tweet))
-tweet_text = result[0].text
-print(tweet.text)
-print(tweet.source_url)
-print(tweet.source)
-print(tweet.created_at)
-print(type(tweet.created_at))
-
-
 JST = timezone(timedelta(hours=9), "JST")
 now = datetime.now(JST)
 
 if isinstance(tweet.created_at, datetime) is False:
+    # 日付がわからないときは判別不可能なので、何もしない
     exit()
 
-delta = now - tweet.created_at
+delta: timedelta = now - tweet.created_at
 if delta.days > 1:
+    # Tweet がないときは更新しないこととする
     exit()
 
 line_access_token = os.getenv("LINE_BOT_ACCESS_TOKEN")
 
-line_bot_api = LineBotApi(line_access_token)
-line_bot_api.broadcast(TextSendMessage(text=tweet_text))
+line = LineBotApi(line_access_token)
+line.broadcast(TextSendMessage(text=tweet.text))
+
+for media in tweet.extended_entities["media"]:
+    line.broadcast(
+        ImageSendMessage(
+            original_content_url=media["media_url_https"],
+            preview_image_url=media["media_url_https"],
+        )
+    )
