@@ -1,8 +1,9 @@
 import os
 
-import tweepy
 from dotenv import load_dotenv
-
+from linebot import LineBotApi
+import tweepy
+from linebot.models import TextSendMessage
 
 load_dotenv()
 
@@ -22,4 +23,9 @@ auth.set_access_token(access_token, access_token_secret)
 twitter = tweepy.API(auth)
 result = twitter.user_timeline(id=twitter_user_id, count=1)
 
-print(result[0].text)
+tweet_text = result[0].text
+
+ACCESS_TOKEN = os.getenv("LINE_BOT_ACCESS_TOKEN")
+
+line_bot_api = LineBotApi(ACCESS_TOKEN)
+line_bot_api.broadcast(TextSendMessage(text=tweet_text))

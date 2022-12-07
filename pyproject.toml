@@ -8,6 +8,7 @@ authors = ["shin-hama <htysivista@gmail.com>"]
 python = "^3.9"
 tweepy = "^4.12.1"
 python-dotenv = "^0.21.0"
+line-bot-sdk = "^2.3.0"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.991"
