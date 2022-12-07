@@ -17,9 +17,15 @@ auth.set_access_token(TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_TOKEN_SECRET)
 twitter = tweepy.API(auth)
 
 
-def get_tweet(id: str):
+def get_tweet(user_id: str):
+    """
+    指定した User の最新ツイートを取得する
 
-    result: list[Status] = twitter.user_timeline(id=id, count=1)
+    parameter
+    ---------
+    user_id: user id to get tweet
+    """
+    result: list[Status] = twitter.user_timeline(user_id=user_id, count=1)
 
     # 最新のツイートを取得
     return result[0]
