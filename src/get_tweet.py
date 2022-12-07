@@ -1,9 +1,7 @@
-import os
-
 import tweepy
 from tweepy.models import Status
 
-from config import (
+from .config import (
     TWITTER_API_KEY,
     TWITTER_API_SECRET,
     TWITTER_ACCESS_TOKEN,

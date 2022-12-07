@@ -1,9 +1,11 @@
 from datetime import datetime, timezone, timedelta
 import logging
 
-from config import TWITTER_USER_ID
-from get_tweet import get_tweet
-from send_message import send_image, send_message
+import functions_framework
+
+from src.config import TWITTER_USER_ID
+from src.get_tweet import get_tweet
+from src.send_message import send_image, send_message
 
 JST = timezone(timedelta(hours=9), "JST")
 
@@ -14,7 +16,8 @@ ch.setLevel(logging.INFO)
 logger.addHandler(ch)
 
 
-def main():
+@functions_framework.cloud_event
+def main(cloud_event):
     """
     Get latest tweet and notify it by line bot
     """
@@ -54,4 +57,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(None)

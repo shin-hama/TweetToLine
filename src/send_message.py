@@ -1,7 +1,7 @@
 from linebot import LineBotApi
 from linebot.models import ImageSendMessage, TextSendMessage
 
-from config import LINE_BOT_ACCESS_TOKEN
+from .config import LINE_BOT_ACCESS_TOKEN
 
 
 line = LineBotApi(LINE_BOT_ACCESS_TOKEN)
