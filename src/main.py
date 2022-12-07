@@ -20,7 +20,6 @@ auth = tweepy.OAuthHandler(api_key, api_secret)
 auth.set_access_token(access_token, access_token_secret)
 
 twitter = tweepy.API(auth)
-print(twitter_user_id)
 result = twitter.user_timeline(id=twitter_user_id, count=1)
 
-print(result)
+print(result[0].text)
