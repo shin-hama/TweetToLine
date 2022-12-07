@@ -49,8 +49,9 @@ def main(cloud_event):
     try:
         send_message(tweet.text)
 
-        for media in tweet.extended_entities["media"]:
-            send_image(media["media_url_https"])
+        if hasattr(tweet, "extended_entities"):
+            for media in tweet.extended_entities["media"]:
+                send_image(media["media_url_https"])
     except Exception as ex:
         logger.error(ex)
         return
