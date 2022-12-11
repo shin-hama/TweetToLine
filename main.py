@@ -1,13 +1,10 @@
-from datetime import datetime, timezone, timedelta
 import logging
 
 import functions_framework
 
 from src.config import TWITTER_USER_ID
-from src.get_tweet import get_tweet
+from src.get_tweet import get_tweets_of_the_day
 from src.send_message import send_image, send_message
-
-JST = timezone(timedelta(hours=9), "JST")
 
 logger = logging.getLogger("main")
 logger.setLevel(logging.INFO)
@@ -22,36 +19,25 @@ def main(cloud_event):
     Get latest tweet and notify it by line bot
     """
     try:
-        tweet = get_tweet(TWITTER_USER_ID)
+        tweets = get_tweets_of_the_day(TWITTER_USER_ID)
     except Exception as ex:
         logger.error(ex)
         return
 
-    logger.debug("Found tweet")
-    logger.debug("username: %s", tweet.user.name)
-    logger.debug("body: %s", tweet.text)
-
-    if isinstance(tweet.created_at, datetime):
-        now = datetime.now(JST)
-        delta = now - tweet.created_at
-    else:
-        logger.warning("Unsupported format: tweet.created_at")
-        logger.warning("tweet: %s", tweet)
-        # 日付がわからないときは判別不可能なので、何もしない
+    if len(tweets) == 0:
+        logger.info("There are no tweets of today")
         return
 
-    if delta.days > 1:
-        logger.info("There are no new tweet")
-        logger.info("latest: %s", tweet)
-        # Tweet 更新なしとする
-        return
+    logger.debug("Found tweets")
+    logger.debug("tweets count: %s", len(tweets))
 
     try:
-        send_message(tweet.text)
+        for tweet in tweets:
+            send_message(tweet.text)
 
-        if hasattr(tweet, "extended_entities"):
-            for media in tweet.extended_entities["media"]:
-                send_image(media["media_url_https"])
+            if hasattr(tweet, "extended_entities"):
+                for media in tweet.extended_entities["media"]:
+                    send_image(media["media_url_https"])
     except Exception as ex:
         logger.error(ex)
         return
