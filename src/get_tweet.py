@@ -43,7 +43,7 @@ def is_today(tweet: Status) -> bool:
             return False
         else:
             # timedelta が 24 時間以内で、日付が同じなら本日のデータとする
-            return tweeted_at.day == now.day - 1
+            return tweeted_at.day == now.day
     else:
         # 日付がわからないときは判別不可能なので、何もしない
         return False

@@ -7,9 +7,9 @@ from src.get_tweet import get_tweets_of_the_day
 from src.send_message import send_image, send_message
 
 logger = logging.getLogger("main")
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
+ch.setLevel(logging.DEBUG)
 logger.addHandler(ch)
 
 
@@ -24,20 +24,16 @@ def main(cloud_event):
         logger.error(ex)
         return
 
-    if len(tweets) == 0:
-        logger.info("There are no tweets of today")
-        return
-
-    logger.debug("Found tweets")
-    logger.debug("tweets count: %s", len(tweets))
-
     try:
         for tweet in tweets:
+            logger.debug(tweet.text)
+
             send_message(tweet.text)
 
             if hasattr(tweet, "extended_entities"):
                 for media in tweet.extended_entities["media"]:
                     send_image(media["media_url_https"])
+
     except Exception as ex:
         logger.error(ex)
         return
